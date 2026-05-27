@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Remote Commander — secure shield logo">
+  <defs>
+    <linearGradient id="bgC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2c2c30"/>
+      <stop offset="1" stop-color="#19191b"/>
+    </linearGradient>
+    <linearGradient id="shieldC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f9cf0"/>
+      <stop offset="1" stop-color="#0069ac"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bgC)"/>
+  <rect x="0.75" y="0.75" width="254.5" height="254.5" rx="55" fill="none" stroke="#3c3c41" stroke-width="1.5"/>
+  <!-- shield (security) -->
+  <path d="M128 44 L196 74 V132 Q196 178 128 214 Q60 178 60 132 V74 Z"
+        fill="url(#shieldC)" stroke="#0a0a0c" stroke-width="5" stroke-linejoin="round"/>
+  <!-- terminal chevron + cursor inside ( >_ ) -->
+  <path d="M104 104 L134 134 L104 164" fill="none" stroke="#ffffff" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="142" y="151" width="36" height="14" rx="7" fill="#ffffff"/>
+</svg>

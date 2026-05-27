@@ -1,0 +1,98 @@
+name: Release
+
+# Build installers for Windows, macOS, and Linux — each on its own native runner.
+#
+# Triggers:
+#   • push a version tag (v*)  → builds all three AND attaches them to a GitHub Release
+#   • "Run workflow" button     → builds all three, artifacts only (no Release)
+#
+# The Electron app lives in the nested  remoteCommander/  subfolder, so every step that
+# touches the app sets working-directory accordingly.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write        # needed to create/append the GitHub Release on tag builds
+
+# Opt the bundled JS actions (checkout/setup-node/upload-artifact/gh-release) into Node 24,
+# silencing the "Node.js 20 actions are deprecated" warning on the runners.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux      # → AppImage + .deb
+          - os: windows-latest
+            target: win        # → NSIS setup.exe
+          - os: macos-latest
+            target: mac        # → .dmg (x64 + arm64)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: remoteCommander/package-lock.json
+
+      # keytar builds against libsecret on Linux; install its dev headers as a fallback.
+      - name: Install Linux build deps
+        if: matrix.target == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y libsecret-1-dev
+
+      - name: Install dependencies
+        working-directory: remoteCommander
+        run: npm ci
+
+      # `-- --publish never` lands on the trailing electron-builder call so a tag build
+      # never tries to upload to the placeholder `publish` URL in electron-builder.yml.
+      - name: Build installers
+        working-directory: remoteCommander
+        run: npm run build:${{ matrix.target }} -- --publish never
+        env:
+          # Don't attempt macOS code-signing in CI (unsigned builds for now).
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: remote-commander-${{ matrix.target }}
+          if-no-files-found: error
+          path: |
+            remoteCommander/dist/*.exe
+            remoteCommander/dist/*.dmg
+            remoteCommander/dist/*.AppImage
+            remoteCommander/dist/*.deb
+
+      # Only when triggered by a version tag: attach the installers to a GitHub Release.
+      # Runs per-matrix-job; the action creates the release once and appends to it.
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          body: |
+            This is the latest release of **Remote Commander** (${{ github.ref_name }}).
+
+            Download the installer for your OS below, then follow the matching install guide:
+            **[Windows](https://github.com/RonBulaon/remoteCommander/blob/main/docs/install-windows.md)** ·
+            **[macOS](https://github.com/RonBulaon/remoteCommander/blob/main/docs/install-macos.md)** ·
+            **[Linux](https://github.com/RonBulaon/remoteCommander/blob/main/docs/install-linux.md)**
+          files: |
+            remoteCommander/dist/*.exe
+            remoteCommander/dist/*.dmg
+            remoteCommander/dist/*.AppImage
+            remoteCommander/dist/*.deb

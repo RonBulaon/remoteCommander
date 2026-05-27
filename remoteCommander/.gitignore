@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+dist/
+
+# Vite dep cache
+.vite/
+
+# Claude Code
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.eslintcache
+*.swp
+*~
+
+# Logs
+*.log*
+npm-debug.log*
+
+# Local env overrides
+*.local
+.env
+.env.*

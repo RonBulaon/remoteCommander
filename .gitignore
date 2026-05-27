@@ -1,0 +1,39 @@
+# ── Claude Code internal files ─────────────────────────────────────────────
+.claude/
+
+# ── OS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Editors ────────────────────────────────────────────────────────────────
+*.swp
+*.swo
+*~
+.idea/
+*.iml
+
+# ── Logs ───────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── The Electron project's generated / dependency directories ───────────────
+# (also covered by remoteCommander/.gitignore; listed here as a safety net)
+remoteCommander/node_modules/
+remoteCommander/out/
+remoteCommander/dist/
+remoteCommander/.vite/
+
+# ── Secrets / credentials (NEVER commit) ───────────────────────────────────
+*.pem
+*.ovpn
+*.key
+*.p12
+*.pfx
+support-team.pem
+
+
+#----------local------
+local/

@@ -1,0 +1,72 @@
+/* VS Code Dark Modern token colors */
+:root {
+  --rc-editor-bg:       #1e1e1e;
+  --rc-sidebar-bg:      #252526;
+  --rc-tabbar-bg:       #2d2d2d;
+  --rc-tab-active-bg:   #1e1e1e;
+  --rc-tab-inactive-bg: #2d2d2d;
+  --rc-statusbar-bg:    #007acc;
+  --rc-border:          #3e3e42;
+  --rc-border-strong:   #474747;
+  --rc-hover-bg:        #2a2d2e;
+  --rc-selection-bg:    #094771;
+  --rc-input-bg:        #3c3c3c;
+  --rc-menu-bg:         #252526;
+  --rc-menu-border:     #454545;
+  --rc-accent:          #007acc;
+
+  --rc-text-primary:    #cccccc;
+  --rc-text-secondary:  #858585;
+  --rc-text-muted:      #6d6d6d;
+  --rc-text-header:     #bbbbbb;
+
+  --color-background: var(--rc-editor-bg);
+  --color-text:       var(--rc-text-primary);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+ul { list-style: none; }
+
+/* Themed scrollbars (match the dark VS Code-style UI) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #424247;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4f4f55;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  line-height: 1.6;
+  font-family:
+    'Segoe UI', -apple-system, BlinkMacSystemFont,
+    Roboto, Oxygen, Ubuntu, Cantarell,
+    'Helvetica Neue', sans-serif;
+  font-size: 13px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

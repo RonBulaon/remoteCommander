@@ -1,0 +1,27 @@
+@import 'tailwindcss';
+@import './base.css';
+
+body {
+  background-image: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  align-items: stretch;
+  justify-content: flex-start;
+  margin: 0;
+}
+
+/* Hide scrollbars while keeping scroll functionality */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,0 +1,18 @@
+{
+  "device": "core-switch-01",
+  "model": "Catalyst-9300",
+  "managementUrl": "https://10.0.0.2",
+  "uptimeSeconds": 1843277,
+  "temperatureC": 41.5,
+  "redundant": true,
+  "firmware": null,
+  "tags": ["production", "rack-a", "vlan-trunk"],
+  "interfaces": [
+    { "name": "Gi1/0/1", "speedMbps": 1000, "up": true, "vlan": 10 },
+    { "name": "Gi1/0/2", "speedMbps": 1000, "up": false, "vlan": null }
+  ],
+  "snmp": { "community": "public", "version": 2, "trapHost": "10.0.0.250" },
+  "notes": "Quote test: \"do not reboot\" during business hours. Path C:\\configs\\sw01.",
+  "negativeExample": -273.15,
+  "exponent": 6.022e23
+}

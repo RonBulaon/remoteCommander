@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Remote Commander — Test Files</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0; background: #1e1e1e; color: #cccccc;
+      font: 14px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif;
+      padding: 32px; max-width: 720px; margin: 0 auto;
+    }
+    h1 { color: #e8e8e8; border-bottom: 1px solid #3e3e42; padding-bottom: .3em; }
+    a.card {
+      display: block; text-decoration: none; color: #cccccc;
+      border: 1px solid #3e3e42; border-radius: 6px;
+      padding: 14px 16px; margin: 12px 0; transition: border-color .15s, background .15s;
+    }
+    a.card:hover { border-color: #007acc; background: #252526; }
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      padding: 1px 6px; border-radius: 3px; margin-right: 8px;
+      color: #d7ba7d; background: #d7ba7d18; border: 1px solid #d7ba7d40;
+    }
+    .name { font-weight: 600; color: #e8e8e8; }
+    .desc { color: #858585; font-size: 13px; margin-top: 4px; }
+    code { background: #2d2d2d; padding: 1px 5px; border-radius: 3px; font-family: Consolas, monospace; }
+    footer { margin-top: 28px; color: #6d6d6d; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Remote Commander — Test Files</h1>
+  <p>
+    This page itself tests normal HTML rendering and clickable links. Each card below
+    opens a file that exercises a different inline viewer.
+  </p>
+
+  <a class="card" href="sample.json">
+    <div><span class="badge">JSON</span><span class="name">sample.json</span></div>
+    <div class="desc">Pretty-print + syntax highlight, with a Raw/Formatted toggle.</div>
+  </a>
+
+  <a class="card" href="sample.md">
+    <div><span class="badge">MD</span><span class="name">sample.md</span></div>
+    <div class="desc">Markdown rendering — includes a table, which is intentionally unsupported.</div>
+  </a>
+
+  <a class="card" href="sample.pdf">
+    <div><span class="badge">PDF</span><span class="name">sample.pdf</span></div>
+    <div class="desc">Inline PDF rendering via Chromium's built-in PDFium viewer.</div>
+  </a>
+
+  <a class="card" href="README.md">
+    <div><span class="badge">MD</span><span class="name">README.md</span></div>
+    <div class="desc">Usage instructions (also a second Markdown sample).</div>
+  </a>
+
+  <footer>
+    Served by <code>testfiles/serve.mjs</code>. The Web Console blocks <code>file://</code>,
+    so these must be loaded over <code>http</code>.
+  </footer>
+</body>
+</html>
