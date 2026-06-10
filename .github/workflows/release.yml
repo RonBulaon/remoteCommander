@@ -18,8 +18,8 @@ on:
 permissions:
   contents: write        # needed to create/append the GitHub Release on tag builds
 
-# Opt the bundled JS actions (checkout/setup-node/upload-artifact/gh-release) into Node 24,
-# silencing the "Node.js 20 actions are deprecated" warning on the runners.
+# Insurance for any third-party action that still targets Node 20 — official
+# actions below are pinned to v5 (Node 24 native).
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -40,10 +40,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -68,7 +68,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: remote-commander-${{ matrix.target }}
           if-no-files-found: error
