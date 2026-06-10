@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, Menu, ipcMain, screen } from 'electron'
+import { app, shell, BrowserWindow, Menu, clipboard, ipcMain, screen } from 'electron'
 import type { WebContents } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -263,6 +263,42 @@ function hardenGuestContents(contents: WebContents): void {
   })
 }
 
+// ── Universal right-click context menu ────────────────────────────────────
+// Attaches a Cut/Copy/Paste/Select-All menu to every webContents (main window
+// + each guest <webview>), so right-click works for clipboard actions anywhere
+// the page hasn't already handled the contextmenu. Existing keyboard paths are
+// unaffected: the Edit-menu Ctrl+C/V accelerators still drive standard inputs,
+// and terminals keep their Ctrl+Shift+C/V. When a renderer component handles
+// the contextmenu itself (Radix menus on tabs/file rows, terminal canvases),
+// it calls preventDefault — which suppresses this menu, so there are no
+// duplicate popups.
+function attachContextMenu(contents: WebContents): void {
+  contents.on('context-menu', (_event, params) => {
+    const { editFlags, linkURL, selectionText, isEditable } = params
+    const items: Electron.MenuItemConstructorOptions[] = []
+
+    if (linkURL) {
+      items.push({ label: 'Copy Link', click: () => clipboard.writeText(linkURL) })
+      items.push({ type: 'separator' })
+    }
+    if (isEditable) {
+      items.push({ role: 'cut',       enabled: editFlags.canCut })
+      items.push({ role: 'copy',      enabled: editFlags.canCopy })
+      items.push({ role: 'paste',     enabled: editFlags.canPaste })
+      items.push({ type: 'separator' })
+      items.push({ role: 'selectAll', enabled: editFlags.canSelectAll })
+    } else if (selectionText.trim().length > 0) {
+      items.push({ role: 'copy', enabled: editFlags.canCopy })
+    } else {
+      // Nothing actionable here — skip the menu rather than show an empty one.
+      return
+    }
+    Menu.buildFromTemplate(items).popup({
+      window: BrowserWindow.fromWebContents(contents) ?? undefined,
+    })
+  })
+}
+
 // ── TLS certificate gate ───────────────────────────────────────────────────
 // Default behavior (reject invalid certs) is preserved for everything except
 // origins the user explicitly opted into — either persistently via a web
@@ -308,6 +344,7 @@ app.whenReady().then(() => {
 
   app.on('web-contents-created', (_event, contents) => {
     hardenGuestContents(contents)
+    attachContextMenu(contents)
   })
 
   app.on('certificate-error', handleCertificateError)

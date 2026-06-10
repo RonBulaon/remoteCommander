@@ -240,7 +240,20 @@ export function LocalTerminalTab({ tab, isActive }: { tab: Tab; isActive: boolea
       </div>
 
       <div className="relative flex-1 overflow-hidden">
-        <div ref={containerRef} className="h-full w-full" style={{ padding: '2px 4px 0' }} />
+        {/* xterm renders to canvas, so the browser has no native selection to
+            right-click on. Mirror PuTTY/tmux: right-click copies any xterm
+            selection, otherwise pastes. preventDefault also suppresses the
+            main-process context menu here. */}
+        <div
+          ref={containerRef}
+          className="h-full w-full"
+          style={{ padding: '2px 4px 0' }}
+          onContextMenu={(e) => {
+            e.preventDefault()
+            if (termRef.current?.hasSelection()) handleCopy()
+            else handlePaste()
+          }}
+        />
       </div>
 
       <div className="flex h-[22px] shrink-0 items-center gap-2 border-t border-[#3e3e42] bg-[#1a1a1a] px-3">

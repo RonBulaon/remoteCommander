@@ -403,8 +403,20 @@ export function SshTab({ tab, isActive }: { tab: Tab; isActive: boolean }) {
           </div>
         )}
 
-        {/* xterm.js mount point — fills the area */}
-        <div ref={containerRef} className="h-full w-full" style={{ padding: '2px 4px 0' }} />
+        {/* xterm.js mount point — fills the area. xterm renders to canvas so
+            the browser has no native "selection" to right-click on; mirror the
+            PuTTY/tmux convention: right-click with selection copies, without it
+            pastes. preventDefault also suppresses the main-process menu here. */}
+        <div
+          ref={containerRef}
+          className="h-full w-full"
+          style={{ padding: '2px 4px 0' }}
+          onContextMenu={(e) => {
+            e.preventDefault()
+            if (termRef.current?.hasSelection()) handleCopy()
+            else handlePaste()
+          }}
+        />
       </div>
 
       {/* ── Status bar ── */}

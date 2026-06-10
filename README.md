@@ -79,6 +79,9 @@ with battle-tested system tools (guacd/FreeRDP, OpenVPN/WireGuard).
 ### Built to feel native
 - Frameless, dark, VS Code Dark Modern theme throughout (including scrollbars and a custom
   title bar with File/View/Help menus).
+- **Universal copy/paste** — standard `Ctrl/Cmd+C/V` for inputs and selected text, **right-click
+  Cut/Copy/Paste/Select-All anywhere** (including inside the web-console `<webview>` guests), and
+  terminal-native `Ctrl+Shift+C/V` (plus right-click) in the SSH and local-terminal tabs.
 - Credentials persist **encrypted at rest** (OS keychain via keytar, or an encrypted file
   fallback) so you don't re-type them every launch.
 
@@ -218,9 +221,11 @@ remoteCommander/            ← repo root (docs)
 
 | Doc | What's in it |
 |---|---|
+| **[User Guide](docs/user-guide.md)** | How to use the features — profiles, connecting, splitting panes, workspaces, VPN, clipboard, shortcuts, troubleshooting. |
 | **[ARCHITECTURE.md](ARCHITECTURE.md)** | Exhaustive code reference — process model, IPC contract, every service/store/component, security, conventions, extension recipes. |
 | **[BUILD.md](BUILD.md)** | Rebuild the dev environment on a new machine, runtime tool requirements, and how to produce Windows/macOS/Linux installers — locally per-OS or via the GitHub Actions release workflow. |
 | **Install guides** | End-user download → install → run, per platform — **[Windows](docs/install-windows.md)** · **[macOS](docs/install-macos.md)** · **[Linux](docs/install-linux.md)**. |
+| **[CHANGELOG.md](CHANGELOG.md)** | What changed in each release (Keep a Changelog format). |
 
 ---
 
