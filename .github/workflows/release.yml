@@ -1,9 +1,12 @@
 name: Release
 
 # Build installers for Windows, macOS, and Linux — each on its own native runner.
+# Then a single dedicated `release` job downloads all three sets of artifacts and
+# publishes them to the GitHub Release — avoiding the asset-upload race when three
+# matrix jobs hit the same release in parallel.
 #
 # Triggers:
-#   • push a version tag (v*)  → builds all three AND attaches them to a GitHub Release
+#   • push a version tag (v*)  → builds all three AND publishes them as a GitHub Release
 #   • "Run workflow" button     → builds all three, artifacts only (no Release)
 #
 # The Electron app lives in the nested  remoteCommander/  subfolder, so every step that
@@ -16,10 +19,10 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: write        # needed to create/append the GitHub Release on tag builds
+  contents: write        # needed by the release job to create/update the GitHub Release
 
 # Insurance for any third-party action that still targets Node 20 — official
-# actions below are pinned to v5 (Node 24 native).
+# actions below are pinned to v5; this env keeps still-Node-20 actions working.
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -78,10 +81,27 @@ jobs:
             remoteCommander/dist/*.AppImage
             remoteCommander/dist/*.deb
 
-      # Only when triggered by a version tag: attach the installers to a GitHub Release.
-      # Runs per-matrix-job; the action creates the release once and appends to it.
-      - name: Attach to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
+  # Single uploader runs only on tag pushes, after all three matrix builds finish.
+  # Pulls every artifact from the build jobs and creates/updates the GitHub Release
+  # exactly once — no parallel writes to the release, so no auth/race errors.
+  release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List assets to publish
+        run: ls -la dist/
+
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           body: |
@@ -92,7 +112,7 @@ jobs:
             **[macOS](https://github.com/RonBulaon/remoteCommander/blob/main/docs/install-macos.md)** ·
             **[Linux](https://github.com/RonBulaon/remoteCommander/blob/main/docs/install-linux.md)**
           files: |
-            remoteCommander/dist/*.exe
-            remoteCommander/dist/*.dmg
-            remoteCommander/dist/*.AppImage
-            remoteCommander/dist/*.deb
+            dist/*.exe
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.deb
