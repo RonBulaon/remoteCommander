@@ -82,8 +82,10 @@ jobs:
             remoteCommander/dist/*.deb
 
   # Single uploader runs only on tag pushes, after all three matrix builds finish.
-  # Pulls every artifact from the build jobs and creates/updates the GitHub Release
-  # exactly once — no parallel writes to the release, so no auth/race errors.
+  # Uses the `gh` CLI (pre-installed on runners, native GITHUB_TOKEN) for *sequential*
+  # uploads — softprops/action-gh-release@v2 uploads in parallel and the GitHub asset
+  # API rate-limits/auth-fails when several uploads are inflight against the same
+  # release, regardless of whether they're across jobs or within one.
   release:
     name: Publish GitHub Release
     if: startsWith(github.ref, 'refs/tags/')
@@ -101,18 +103,42 @@ jobs:
       - name: List assets to publish
         run: ls -la dist/
 
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          body: |
+      - name: Create or update the GitHub Release and upload assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          NOTES: |
             This is the latest release of **Remote Commander** (${{ github.ref_name }}).
 
             Download the installer for your OS below, then follow the matching install guide:
             **[Windows](https://github.com/RonBulaon/remoteCommander/blob/main/docs/install-windows.md)** ·
             **[macOS](https://github.com/RonBulaon/remoteCommander/blob/main/docs/install-macos.md)** ·
             **[Linux](https://github.com/RonBulaon/remoteCommander/blob/main/docs/install-linux.md)**
-          files: |
-            dist/*.exe
-            dist/*.dmg
-            dist/*.AppImage
-            dist/*.deb
+        run: |
+          set -e
+
+          # Create the release if it doesn't exist yet; otherwise just refresh the notes.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::group::Updating existing release $TAG"
+            gh release edit "$TAG" --notes "$NOTES"
+            echo "::endgroup::"
+          else
+            echo "::group::Creating release $TAG"
+            gh release create "$TAG" --title "$TAG" --notes "$NOTES"
+            echo "::endgroup::"
+          fi
+
+          # Upload each asset *sequentially*; --clobber replaces existing assets in place.
+          for f in dist/*.exe dist/*.dmg dist/*.AppImage dist/*.deb; do
+            if [ -f "$f" ]; then
+              echo "::group::Upload $(basename "$f")"
+              gh release upload "$TAG" "$f" --clobber
+              echo "::endgroup::"
+            else
+              echo "(skip: no file matches $f)"
+            fi
+          done
+
+          echo "::group::Final asset list on $TAG"
+          gh release view "$TAG" --json assets --jq '.assets[] | "\(.name)  (\(.size) bytes)"'
+          echo "::endgroup::"
